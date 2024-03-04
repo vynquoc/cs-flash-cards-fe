@@ -64,25 +64,39 @@ export default function CardModal({ card, onClose }) {
           sx={{
             display: "flex",
             justifyContent: "space-between",
+            fontSize: { xs: "8px" },
             alignItems: "center",
+            mb: "8px",
           }}
         >
           <Box sx={{ display: "flex" }}>
             <Link to={`/edit/${card?.id}`}>
-              <Button variant="contained" size="small">
+              <Button
+                variant="contained"
+                size="small"
+                sx={{ fontSize: { xs: "12px" } }}
+              >
                 Edit
               </Button>
             </Link>
-            <Button size="small" onClick={() => handleDelete(card.id)}>
+            <Button
+              size="small"
+              onClick={() => handleDelete(card.id)}
+              sx={{ fontSize: { xs: "12px" } }}
+            >
               Delete
             </Button>
           </Box>
 
-          <Button size="small" onClick={onClose}>
+          <Button
+            size="small"
+            onClick={onClose}
+            sx={{ fontSize: { xs: "12px" } }}
+          >
             Close
           </Button>
         </Box>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
+        <Typography id="modal-modal-title" variant="p" component="h3">
           {card?.title}
         </Typography>
         <Box>
