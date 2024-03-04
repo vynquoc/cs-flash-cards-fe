@@ -80,7 +80,7 @@ const ReviewingCard = ({ cards, random }) => {
                 disabled={cards[index]?.code_snippet === null}
               />
             </Tabs>
-            <Box fullWidth sx={{ height: "300px" }}>
+            <Box sx={{ height: "300px" }}>
               {flipped ? (
                 tab === 0 ? (
                   <Box

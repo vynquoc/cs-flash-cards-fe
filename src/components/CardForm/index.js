@@ -12,7 +12,6 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import CustomTextarea from "../Textarea";
 import Markdown from "react-markdown";
-import CodeBlock from "../CodeBlock";
 
 import MultipleSelectChip from "../Chip";
 import RowRadioButtonsGroup from "../RadioGroup";
@@ -147,7 +146,6 @@ export default function CardForm({ card, mode }) {
             flexDirection: "column",
             alignItems: "center",
           }}
-          fullWidth
         >
           <Box component="form" noValidate sx={{ mt: 3 }}>
             <Grid container spacing={2}>
