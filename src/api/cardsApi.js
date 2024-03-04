@@ -30,6 +30,10 @@ const cardsApi = {
     const url = `/random`;
     return axiosClient.get(url);
   },
+  deleteCard: (id) => {
+    const url = `/cards/${id}`;
+    return axiosClient.delete(url);
+  },
 };
 
 export default cardsApi;
