@@ -1,24 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from "react";
+import { Routes, Route } from "react-router-dom";
+import CssBaseline from "@mui/material/CssBaseline";
+import Navbar from "./components/Navbar";
+import AddCardPage from "./pages/AddCard";
+import AllCardsPage from "./pages/AllCards";
+import TodayCardsPage from "./pages/TodayCards";
+import EditCardPage from "./pages/EditCard";
+import RandomCardPage from "./pages/RandomCard";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      <CssBaseline />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<TodayCardsPage />} />
+        <Route path="/today" element={<TodayCardsPage />} />
+        <Route path="/all" element={<AllCardsPage />} />
+        <Route path="/random" element={<RandomCardPage />} />
+        <Route path="/add" element={<AddCardPage />} />
+        <Route path="/edit/:id" element={<EditCardPage />} />
+      </Routes>
+    </React.Fragment>
   );
 }
 
