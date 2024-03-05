@@ -123,8 +123,8 @@ export default function CardModal({ card, onClose }) {
         {card?.code_snippet !== null && (
           <>
             <Divider />
-            <Box sx={{ mt: "8px" }} align="center">
-              <Typography variant="p" component="h3">
+            <Box sx={{ mt: "8px" }}>
+              <Typography variant="p" component="h3" align="center">
                 Code
               </Typography>
               <SyntaxHighlighter
