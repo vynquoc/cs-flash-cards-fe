@@ -113,14 +113,15 @@ const ReviewingCard = ({ cards, random }) => {
                 <Box
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
                     height: "100%",
+                    flexDirection: "column",
+                    overflowY: "scroll",
                   }}
                 >
                   <Typography component="h6" variant="h6">
                     {cards[index]?.title}
                   </Typography>
+                  <Markdown>{cards[index]?.description}</Markdown>
                 </Box>
               )}
             </Box>

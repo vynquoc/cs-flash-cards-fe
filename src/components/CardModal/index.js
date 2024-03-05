@@ -8,6 +8,8 @@ import rehypeHighlight from "rehype-highlight";
 import Markdown from "react-markdown";
 import { Link } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
+import Divider from "@mui/material/Divider";
+
 import cardsApi from "../../api/cardsApi";
 import Alert from "@mui/material/Alert";
 
@@ -96,19 +98,43 @@ export default function CardModal({ card, onClose }) {
             Close
           </Button>
         </Box>
-        <Typography id="modal-modal-title" variant="p" component="h3">
+        <Typography
+          id="modal-modal-title"
+          variant="p"
+          component="h2"
+          sx={{ my: "10px" }}
+        >
           {card?.title}
         </Typography>
-        <Box>
+        <Divider />
+        <Box sx={{ mt: "8px" }}>
+          <Typography variant="p" component="h3" align="center">
+            Description
+          </Typography>
+          <Markdown>{card?.description}</Markdown>
+        </Box>
+        <Divider />
+        <Box sx={{ mt: "8px" }}>
+          <Typography variant="p" component="h3" align="center">
+            Content
+          </Typography>
           <Markdown rehypePlugins={[rehypeHighlight]}>{card?.content}</Markdown>
         </Box>
         {card?.code_snippet !== null && (
-          <SyntaxHighlighter
-            customStyle={{ with: "100%", fontSize: "10px" }}
-            language={card?.code_snippet?.language}
-          >
-            {card?.code_snippet?.code}
-          </SyntaxHighlighter>
+          <>
+            <Divider />
+            <Box sx={{ mt: "8px" }} align="center">
+              <Typography variant="p" component="h3">
+                Code
+              </Typography>
+              <SyntaxHighlighter
+                customStyle={{ with: "100%", fontSize: "10px" }}
+                language={card?.code_snippet?.language}
+              >
+                {card?.code_snippet?.code}
+              </SyntaxHighlighter>
+            </Box>
+          </>
         )}
         <Snackbar
           open={snack.open}

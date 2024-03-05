@@ -25,6 +25,7 @@ export default function CardForm({ card, mode }) {
     content: card?.content || "",
     tags: card?.tags || [],
     code_snippet: card?.code_snippet || null,
+    description: card?.description || "",
   });
   const [snack, setSnack] = useState({
     open: false,
@@ -161,11 +162,27 @@ export default function CardForm({ card, mode }) {
                   autoFocus
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <MultipleSelectChip
                   onSelect={handleSelectTags}
                   value={cardInfo.tags}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <Typography component="h2" variant="h6">
+                  Description
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <CustomTextarea
+                  name="description"
+                  value={cardInfo.description}
+                  handleChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Markdown>{cardInfo.description}</Markdown>
               </Grid>
               <Grid item xs={12}>
                 <Typography component="h2" variant="h6">
