@@ -107,13 +107,17 @@ export default function CardModal({ card, onClose }) {
           {card?.title}
         </Typography>
         <Divider />
-        <Box sx={{ mt: "8px" }}>
-          <Typography variant="p" component="h3" align="center">
-            Description
-          </Typography>
-          <Markdown>{card?.description}</Markdown>
-        </Box>
-        <Divider />
+        {card?.description !== "" && (
+          <>
+            <Box sx={{ mt: "8px" }}>
+              <Typography variant="p" component="h3" align="center">
+                Description
+              </Typography>
+              <Markdown>{card?.description}</Markdown>
+            </Box>
+            <Divider />
+          </>
+        )}
         <Box sx={{ mt: "8px" }}>
           <Typography variant="p" component="h3" align="center">
             Content
