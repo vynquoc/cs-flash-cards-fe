@@ -27,6 +27,7 @@ const AllCardsPage = () => {
       ...prev,
       tags: newTags,
     }));
+    setCurrentPage(0);
   };
 
   const handleChangeTitle = (e) => {
