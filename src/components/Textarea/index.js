@@ -14,8 +14,6 @@ export default function CustomTextarea({ name, handleChange, value }) {
       name={name}
       value={value}
       onChange={(e) => handleChange(name, e.target.value)}
-    >
-      fafas
-    </textarea>
+    />
   );
 }
