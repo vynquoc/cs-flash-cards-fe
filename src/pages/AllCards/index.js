@@ -1,40 +1,35 @@
 import React, { useEffect, useState } from "react";
 import cardsApi from "../../api/cardsApi";
-import CardModal from "../../components/CardModal";
-import CardList from "../../components/CardList";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import { debounce } from "../../utils";
-
-import CircularProgress from "@mui/material/CircularProgress";
-
-import Filter from "../../components/Filter";
+import { Input, List, Spin, Modal, Divider, Button, message } from "antd";
+import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
+import { TAG_LIST } from "../../constants";
+import MDEditor from "@uiw/react-md-editor";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { Link } from "react-router-dom";
 
 const AllCardsPage = () => {
   const [cards, setCards] = useState([]);
   const [currentCard, setCurrentCard] = useState(null);
-  const [filter, setFilter] = useState({
+  const [filters, setFilters] = useState({
     tags: [],
     title: "",
   });
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const handleSelectTags = (e, newTags) => {
-    setFilter((prev) => ({
-      ...prev,
-      tags: newTags,
-    }));
-    setCurrentPage(0);
-  };
-
-  const handleChangeTitle = (e) => {
-    setFilter((prev) => ({
-      ...prev,
-      title: e.target.value,
-    }));
+  const handleSelectTags = (newTag) => {
+    const index = filters.tags.indexOf(newTag);
+    let newTags = filters.tags;
+    if (index !== -1) {
+      newTags.splice(index, 1);
+    } else {
+      newTags.push(newTag);
+    }
+    setFilters({ ...filters, tags: newTags });
+    setCurrentPage(1);
   };
 
   const getCards = async (params) => {
@@ -50,48 +45,165 @@ const AllCardsPage = () => {
     }
   };
 
-  const handleChangePage = (e, newPage) => {
-    setCurrentPage(newPage);
+  const handleDeleteCard = async (id) => {
+    update();
+    try {
+      await cardsApi.deleteCard(id);
+      success();
+      setCurrentCard(null);
+      setCards((prev) => prev.filter((card) => card.id !== id));
+    } catch (error) {
+      console.log(error);
+      updateError();
+    }
   };
 
-  const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(parseInt(e.target.value));
-    setCurrentPage(0);
+  const update = () => {
+    messageApi.open({
+      type: "loading",
+      content: "Updating",
+      duration: 0,
+      key: "key",
+    });
+    setTimeout(messageApi.destroy, 1500);
+  };
+
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "Deleted!",
+      duration: 0,
+      key: "key",
+    });
+    setTimeout(messageApi.destroy, 1500);
+  };
+
+  const updateError = () => {
+    messageApi.open({
+      type: "error",
+      content: "Something wrong!",
+      key: "key",
+    });
   };
 
   useEffect(() => {
-    getCards({ ...filter, page: currentPage + 1, page_size: rowsPerPage });
-  }, [filter, currentPage, rowsPerPage]);
+    getCards({ ...filters, page: currentPage, page_size: rowsPerPage });
+  }, [filters, currentPage, rowsPerPage]);
 
   return (
-    <Container sx={{ width: 600, maxWidth: "100%", pt: 5 }}>
-      <Filter
-        data={filter}
-        onSelectTag={handleSelectTags}
-        onChangeTitle={debounce(handleChangeTitle)}
-        onChangePage={handleChangePage}
-        onChangeRows={handleChangeRowsPerPage}
-        pagination={{
-          rowsPerPage: rowsPerPage,
-          currentPage: currentPage,
-          totalRecords: totalRecords,
-        }}
+    <div className="p-4">
+      <Input
+        size="large"
+        prefix={<SearchOutlined />}
+        onChange={(e) => setFilters({ ...filters, title: e.target.value })}
       />
-      {loading ? (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+      <div className="flex gap-2 justify-center my-3 flex-wrap">
+        {TAG_LIST.map((tag) => (
+          <div
+            onClick={() => handleSelectTags(tag)}
+            className={`border-2 rounded-[20px] px-3 cursor-pointer hover:text-prim-400 hover:border-prim-300 ${
+              filters?.tags?.includes(tag)
+                ? "text-prim-500 border-prim-500"
+                : ""
+            }`}
+            key={tag}
+          >
+            {tag}
+          </div>
+        ))}
+      </div>
+      {!loading ? (
+        <List
+          itemLayout="vertical"
+          pagination={{
+            onChange: (page) => {
+              setCurrentPage(page);
+            },
+            pageSize: 10,
+            total: totalRecords,
           }}
-        >
-          <CircularProgress />
-        </Box>
+          dataSource={cards}
+          renderItem={(item) => (
+            <div
+              onClick={() => setCurrentCard(item)}
+              className="flex justify-between bg-prim-200 mb-4 border-2 border-prim-400 p-2 text-md rounded-md cursor-pointer items-center max-sm:gap-4"
+            >
+              <p className="font-bold">{item.title}</p>
+              <div className="flex gap-1">
+                {item.tags.map((tag) => (
+                  <div
+                    className="bg-prim-400 text-white font-bold px-1 rounded-md"
+                    key={tag}
+                  >
+                    {tag}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        />
       ) : (
-        <CardList cards={cards} onItemClick={setCurrentCard} />
+        <div className="flex justify-center">
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
+        </div>
       )}
-      <CardModal card={currentCard} onClose={() => setCurrentCard(null)} />
-    </Container>
+      <Modal
+        open={currentCard !== null}
+        centered
+        footer={null}
+        closable={false}
+      >
+        <div className="flex justify-between pb-4 border-b">
+          <div>
+            <Button type="link">
+              <Link to={`/edit/${currentCard?.id}`}>Edit</Link>
+            </Button>
+            <Button onClick={() => handleDeleteCard(currentCard.id)}>
+              Delete
+            </Button>
+          </div>
+          <Button
+            className="font-bold"
+            type="primary"
+            onClick={() => setCurrentCard(null)}
+          >
+            Close
+          </Button>
+        </div>
+        <div className="max-h-[700px] overflow-y-scroll">
+          <p className="text-xl font-bold text-center mt-6">
+            {currentCard?.title}
+          </p>
+          {currentCard?.description !== "" && (
+            <>
+              {" "}
+              <Divider>Description</Divider>
+              <div data-color-mode="light">
+                <MDEditor.Markdown source={currentCard?.description} />
+              </div>
+            </>
+          )}
+          <Divider>Content</Divider>
+          <div data-color-mode="light">
+            <MDEditor.Markdown source={currentCard?.content} />
+          </div>
+          {currentCard?.code_snippet && (
+            <>
+              <Divider>Code</Divider>
+              <div data-color-mode="light">
+                <SyntaxHighlighter
+                  language={currentCard?.code_snippet?.language}
+                  customStyle={{ height: "100%" }}
+                >
+                  {currentCard?.code_snippet?.code}
+                </SyntaxHighlighter>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+      {contextHolder}
+    </div>
   );
 };
 

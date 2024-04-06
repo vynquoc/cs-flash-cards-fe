@@ -16,7 +16,6 @@ const cardsApi = {
   getAllCards: (params) => {
     const data = {
       ...params,
-      tags: params.tags.join(","),
     };
 
     const url = `/cards`;

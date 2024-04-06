@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ReviewingCard from "../../components/ReviewingCards";
 import cardsApi from "../../api/cardsApi";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
+import { Button, Flex } from "antd";
+import { RedoOutlined } from "@ant-design/icons";
 
 const RandomCardPage = () => {
   const [card, setCard] = useState(null);
@@ -18,25 +18,18 @@ const RandomCardPage = () => {
   useEffect(() => {
     getCard();
   }, [fetching]);
+
   return (
-    <Container
-      component="main"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        padding: "20px",
-        alignItems: "center",
-      }}
-    >
+    <Flex vertical align="center" className="pt-[40px]">
       <Button
+        className="w-[150px] font-bold"
+        type="primary"
+        size="large"
         onClick={() => setFetching(!fetching)}
-        variant="contained"
-        sx={{ width: "fit-content" }}
-      >
-        Random
-      </Button>
+        icon={<RedoOutlined />}
+      ></Button>
       <ReviewingCard cards={[card]} random />
-    </Container>
+    </Flex>
   );
 };
 

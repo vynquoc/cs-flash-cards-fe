@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Routes, Route } from "react-router-dom";
-import CssBaseline from "@mui/material/CssBaseline";
 import Navbar from "./components/Navbar";
 import AddCardPage from "./pages/AddCard";
 import AllCardsPage from "./pages/AllCards";
@@ -14,13 +13,11 @@ function App() {
     <ConfigProvider
       theme={{
         token: {
-          // Seed Token
           colorPrimary: "#164863",
         },
       }}
     >
       <React.Fragment>
-        <CssBaseline />
         <Navbar />
         <Routes>
           <Route path="/" element={<TodayCardsPage />} />
