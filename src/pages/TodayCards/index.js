@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import cardsApi from "../../api/cardsApi";
 import ReviewingCard from "../../components/ReviewingCards";
-import Container from "@mui/material/Container";
 
 const TodayCardsPage = () => {
   const [cards, setCards] = useState([]);
@@ -17,9 +16,9 @@ const TodayCardsPage = () => {
     getCards();
   }, []);
   return (
-    <Container component="main">
+    <div>
       <ReviewingCard cards={cards} />
-    </Container>
+    </div>
   );
 };
 

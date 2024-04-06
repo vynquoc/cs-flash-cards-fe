@@ -7,21 +7,31 @@ import AllCardsPage from "./pages/AllCards";
 import TodayCardsPage from "./pages/TodayCards";
 import EditCardPage from "./pages/EditCard";
 import RandomCardPage from "./pages/RandomCard";
+import { ConfigProvider } from "antd";
 
 function App() {
   return (
-    <React.Fragment>
-      <CssBaseline />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<TodayCardsPage />} />
-        <Route path="/today" element={<TodayCardsPage />} />
-        <Route path="/all" element={<AllCardsPage />} />
-        <Route path="/random" element={<RandomCardPage />} />
-        <Route path="/add" element={<AddCardPage />} />
-        <Route path="/edit/:id" element={<EditCardPage />} />
-      </Routes>
-    </React.Fragment>
+    <ConfigProvider
+      theme={{
+        token: {
+          // Seed Token
+          colorPrimary: "#164863",
+        },
+      }}
+    >
+      <React.Fragment>
+        <CssBaseline />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<TodayCardsPage />} />
+          <Route path="/today" element={<TodayCardsPage />} />
+          <Route path="/all" element={<AllCardsPage />} />
+          <Route path="/random" element={<RandomCardPage />} />
+          <Route path="/add" element={<AddCardPage />} />
+          <Route path="/edit/:id" element={<EditCardPage />} />
+        </Routes>
+      </React.Fragment>
+    </ConfigProvider>
   );
 }
 
