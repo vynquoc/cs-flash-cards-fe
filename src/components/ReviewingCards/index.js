@@ -36,7 +36,7 @@ function General({ card, flipped }) {
 
 function Code({ card }) {
   return (
-    <div className="h-[300px] text-xs overflow-y-scroll">
+    <div className="h-[300px] max-sm:h-[330px] text-xs overflow-y-scroll">
       <SyntaxHighlighter
         language={card?.code_snippet?.language}
         customStyle={{ height: "100%" }}

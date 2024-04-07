@@ -20,7 +20,7 @@ const RandomCardPage = () => {
   }, [fetching]);
 
   return (
-    <Flex vertical align="center" className="pt-[40px]">
+    <Flex vertical align="center" className="">
       <Button
         className="w-[150px] font-bold"
         type="primary"
