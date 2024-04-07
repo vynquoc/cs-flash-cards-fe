@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CodeFilled, ReadFilled } from "@ant-design/icons";
+import { CodeFilled, ReadFilled, FireFilled } from "@ant-design/icons";
 import { Tabs, message } from "antd";
 
 import { Button } from "antd";
@@ -14,7 +14,7 @@ function General({ card, flipped }) {
   return (
     <div
       data-color-mode="light"
-      className="h-[300px] flex flex-col justify-center items-center overflow-y-scroll"
+      className="h-[300px] max-sm:h-[330px] flex flex-col overflow-y-scroll"
     >
       {!flipped ? (
         <>
@@ -112,74 +112,88 @@ const ReviewingCard = ({ cards, random }) => {
 
   return (
     <div className="w-[700px] mx-auto max-sm:w-full max-sm:rounded-none mt-10 border px-4 pb-4 rounded-xl">
-      <Tabs
-        centered
-        size="large"
-        activeKey={tab}
-        onTabClick={(key) => setTab(key)}
-        items={[
-          {
-            key: "general",
-            label: "General",
-            children: <General card={cards[index]} flipped={flipped} />,
-            icon: <ReadFilled />,
-          },
-          {
-            key: "code",
-            label: "Code",
-            disabled: cards[index]?.code_snippet === null,
-            children: <Code card={cards[index]} />,
-            icon: <CodeFilled />,
-          },
-        ]}
-      />
-      <div
-        className={`flex mt-2 ${random ? "justify-center" : "justify-between"}`}
-      >
-        {!random && (
-          <Button
-            type="primary"
-            onClick={handlePrev}
+      {cards.length > 0 ? (
+        <>
+          <Tabs
+            centered
             size="large"
-            disabled={index === 0}
-            className="font-bold"
+            activeKey={tab}
+            onTabClick={(key) => setTab(key)}
+            items={[
+              {
+                key: "general",
+                label: "General",
+                children: <General card={cards[index]} flipped={flipped} />,
+                icon: <ReadFilled />,
+              },
+              {
+                key: "code",
+                label: "Code",
+                disabled: cards[index]?.code_snippet === null,
+                children: <Code card={cards[index]} />,
+                icon: <CodeFilled />,
+              },
+            ]}
+          />
+          <div
+            className={`flex mt-2 ${
+              random ? "justify-center" : "justify-between"
+            }`}
           >
-            Prev
-          </Button>
-        )}
-        <Button
-          onClick={() => setFlipped(!flipped)}
-          type="primary"
-          size="large"
-          className="font-bold"
-        >
-          Flip
-        </Button>
-        {!random && (
-          <Button
-            onClick={handleNext}
-            type="primary"
-            size="large"
-            disabled={index === cards.length - 1}
-            className="font-bold"
-          >
-            Next
-          </Button>
-        )}
-      </div>
-      {!random && (
-        <div className="flex justify-center mt-4">
-          <Button
-            className="w-[100px] mx-auto font-bold"
-            type="primary"
-            size="large"
-            onClick={handleDone}
-          >
-            Got it
-          </Button>
+            {!random && (
+              <Button
+                type="primary"
+                onClick={handlePrev}
+                size="large"
+                disabled={index === 0}
+                className="font-bold"
+              >
+                Prev
+              </Button>
+            )}
+            <Button
+              onClick={() => setFlipped(!flipped)}
+              type="primary"
+              size="large"
+              className="font-bold"
+            >
+              Flip
+            </Button>
+            {!random && (
+              <Button
+                onClick={handleNext}
+                type="primary"
+                size="large"
+                disabled={index === cards.length - 1}
+                className="font-bold"
+              >
+                Next
+              </Button>
+            )}
+          </div>
+          {!random && (
+            <div className="flex justify-center mt-4">
+              <Button
+                className="w-[100px] mx-auto font-bold"
+                type="primary"
+                size="large"
+                onClick={handleDone}
+              >
+                Got it
+              </Button>
+            </div>
+          )}
+          {contextHolder}
+        </>
+      ) : (
+        <div className="h-[300px] text-prim-500 flex flex-col justify-center items-center">
+          <FireFilled style={{ fontSize: "60px" }} />
+          <p className="my-4 font-semibold">
+            You have reviewed all cards today
+          </p>
+          <b>Keep Learning!</b>
         </div>
       )}
-      {contextHolder}
     </div>
   );
 };

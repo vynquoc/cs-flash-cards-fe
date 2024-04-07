@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
 import cardsApi from "../../api/cardsApi";
-import { Input, List, Spin, Modal, Divider, Button, message } from "antd";
-import { SearchOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  Input,
+  List,
+  Spin,
+  Modal,
+  Divider,
+  Button,
+  message,
+  Pagination,
+  Popconfirm,
+} from "antd";
+import { SearchOutlined, LoadingOutlined, ReadFilled } from "@ant-design/icons";
 import { TAG_LIST } from "../../constants";
 import MDEditor from "@uiw/react-md-editor";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { Link } from "react-router-dom";
+import { debounce } from "../../utils";
 
 const AllCardsPage = () => {
   const [cards, setCards] = useState([]);
@@ -58,6 +69,14 @@ const AllCardsPage = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setCurrentPage(1);
+    setFilters({
+      ...filters,
+      title: e.target.value,
+    });
+  };
+
   const update = () => {
     messageApi.open({
       type: "loading",
@@ -91,17 +110,17 @@ const AllCardsPage = () => {
   }, [filters, currentPage, rowsPerPage]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 lg:w-[700px] lg:mx-auto">
       <Input
         size="large"
         prefix={<SearchOutlined />}
-        onChange={(e) => setFilters({ ...filters, title: e.target.value })}
+        onChange={debounce(handleSearchChange)}
       />
-      <div className="flex gap-2 justify-center my-3 flex-wrap">
+      <div className="flex gap-2 justify-center max-sm:justify-normal my-3 flex-wrap">
         {TAG_LIST.map((tag) => (
           <div
             onClick={() => handleSelectTags(tag)}
-            className={`border-2 rounded-[20px] px-3 cursor-pointer hover:text-prim-400 hover:border-prim-300 ${
+            className={`border-2 rounded-[20px] px-3 cursor-pointer ${
               filters?.tags?.includes(tag)
                 ? "text-prim-500 border-prim-500"
                 : ""
@@ -113,35 +132,50 @@ const AllCardsPage = () => {
         ))}
       </div>
       {!loading ? (
-        <List
-          itemLayout="vertical"
-          pagination={{
-            onChange: (page) => {
-              setCurrentPage(page);
-            },
-            pageSize: 10,
-            total: totalRecords,
-          }}
-          dataSource={cards}
-          renderItem={(item) => (
-            <div
-              onClick={() => setCurrentCard(item)}
-              className="flex justify-between bg-prim-200 mb-4 border-2 border-prim-400 p-2 text-md rounded-md cursor-pointer items-center max-sm:gap-4"
-            >
-              <p className="font-bold">{item.title}</p>
-              <div className="flex gap-1">
-                {item.tags.map((tag) => (
-                  <div
-                    className="bg-prim-400 text-white font-bold px-1 rounded-md"
-                    key={tag}
-                  >
-                    {tag}
-                  </div>
-                ))}
-              </div>
-            </div>
+        <>
+          {cards.length > 0 && (
+            <Pagination
+              size="small"
+              current={currentPage}
+              total={totalRecords}
+              showTotal={(total) => (
+                <div className="absolute left-[425px] text-prim-500 text-md max-sm:left-4">
+                  <ReadFilled />
+                  <b className="ml-2">{total} Cards</b>
+                </div>
+              )}
+              onChange={(page) => setCurrentPage(page)}
+              pageSize={rowsPerPage}
+              showSizeChanger
+              rootClassName="flex justify-end mb-4"
+              pageSizeOptions={[5, 10, 20, 50, 100]}
+              onShowSizeChange={(current, size) => setRowsPerPage(size)}
+            />
           )}
-        />
+
+          <List
+            itemLayout="vertical"
+            dataSource={cards}
+            renderItem={(item) => (
+              <div
+                onClick={() => setCurrentCard(item)}
+                className="flex justify-between bg-prim-200 mb-4 border-2 border-prim-400 p-2 text-md rounded-md cursor-pointer items-center max-sm:gap-4"
+              >
+                <p className="font-bold">{item.title}</p>
+                <div className="flex gap-1">
+                  {item.tags.map((tag) => (
+                    <div
+                      className="bg-prim-400 text-white font-bold px-1 rounded-md"
+                      key={tag}
+                    >
+                      {tag}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          />
+        </>
       ) : (
         <div className="flex justify-center">
           <Spin indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />} />
@@ -153,53 +187,60 @@ const AllCardsPage = () => {
         footer={null}
         closable={false}
       >
-        <div className="flex justify-between pb-4 border-b">
-          <div>
-            <Button type="link">
-              <Link to={`/edit/${currentCard?.id}`}>Edit</Link>
-            </Button>
-            <Button onClick={() => handleDeleteCard(currentCard.id)}>
-              Delete
+        <div className="max-sm:max-h-[500px] overflow-y-scroll">
+          <div className="flex justify-between pb-4 border-b">
+            <div>
+              <Button type="link">
+                <Link to={`/edit/${currentCard?.id}`}>Edit</Link>
+              </Button>
+              <Popconfirm
+                placement="right"
+                onConfirm={() => handleDeleteCard(currentCard.id)}
+                okText="Yes"
+                cancelText="No"
+                title="Delete this card?"
+              >
+                <Button>Delete</Button>
+              </Popconfirm>
+            </div>
+            <Button
+              className="font-bold"
+              type="primary"
+              onClick={() => setCurrentCard(null)}
+            >
+              Close
             </Button>
           </div>
-          <Button
-            className="font-bold"
-            type="primary"
-            onClick={() => setCurrentCard(null)}
-          >
-            Close
-          </Button>
-        </div>
-        <div className="max-h-[700px] overflow-y-scroll">
-          <p className="text-xl font-bold text-center mt-6">
-            {currentCard?.title}
-          </p>
-          {currentCard?.description !== "" && (
-            <>
-              {" "}
-              <Divider>Description</Divider>
-              <div data-color-mode="light">
-                <MDEditor.Markdown source={currentCard?.description} />
-              </div>
-            </>
-          )}
-          <Divider>Content</Divider>
-          <div data-color-mode="light">
-            <MDEditor.Markdown source={currentCard?.content} />
+          <div className="max-h-[700px] overflow-y-scroll">
+            <p className="text-xl font-bold text-center mt-6">
+              {currentCard?.title}
+            </p>
+            {currentCard?.description !== "" && (
+              <>
+                <Divider style={{ color: "#d3d3d3" }}>Description</Divider>
+                <div data-color-mode="light">
+                  <MDEditor.Markdown source={currentCard?.description} />
+                </div>
+              </>
+            )}
+            <Divider style={{ color: "#d3d3d3" }}>Content</Divider>
+            <div data-color-mode="light">
+              <MDEditor.Markdown source={currentCard?.content} />
+            </div>
+            {currentCard?.code_snippet && (
+              <>
+                <Divider style={{ color: "#d3d3d3" }}>Code</Divider>
+                <div data-color-mode="light">
+                  <SyntaxHighlighter
+                    language={currentCard?.code_snippet?.language}
+                    customStyle={{ height: "100%" }}
+                  >
+                    {currentCard?.code_snippet?.code}
+                  </SyntaxHighlighter>
+                </div>
+              </>
+            )}
           </div>
-          {currentCard?.code_snippet && (
-            <>
-              <Divider>Code</Divider>
-              <div data-color-mode="light">
-                <SyntaxHighlighter
-                  language={currentCard?.code_snippet?.language}
-                  customStyle={{ height: "100%" }}
-                >
-                  {currentCard?.code_snippet?.code}
-                </SyntaxHighlighter>
-              </div>
-            </>
-          )}
         </div>
       </Modal>
       {contextHolder}

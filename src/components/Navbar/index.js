@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/icons/logo.svg";
 import plus from "../../assets/icons/plus-white.svg";
 import burger from "../../assets/icons/burger-white.svg";
+import { PlusCircleFilled } from "@ant-design/icons";
+import { Button, Dropdown } from "antd";
 
 const pages = [
   {
@@ -20,8 +22,27 @@ const pages = [
   },
 ];
 
+const items = [
+  {
+    label: <Link to="/today">Today Cards</Link>,
+    key: "0",
+  },
+  {
+    label: <Link to="/all">All Cards</Link>,
+    key: "1",
+  },
+  {
+    label: <Link to="/random">Random Card</Link>,
+    key: "3",
+  },
+  {
+    icon: <PlusCircleFilled className="text-prim-500" />,
+    label: <Link to="/add">Add Card</Link>,
+    key: "3",
+  },
+];
+
 function Navbar() {
-  const [open, setOpen] = React.useState(false);
   return (
     <div className="bg-prim-200 p-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -43,38 +64,17 @@ function Navbar() {
         className="bg-prim-500 flex p-2 rounded-md gap-2 max-sm:hidden"
         to="/add"
       >
-        <img src={plus} alt="icon" className="w-[22px]" />
+        <img src={plus} alt="icon" className="w-[18px]" />
         <p className="text-white font-bold">Add Card</p>
       </Link>
       <div className="relative hidden max-sm:block">
-        <button
-          onClick={() => setOpen(!open)}
-          className="hidden max-sm:block bg-prim-500 p-2 rounded-md"
-        >
-          <img src={burger} alt="icon" className="w-[22px]" />
-        </button>
-        {open && (
-          <div className="absolute hidden max-sm:block bg-prim-400 left-[-100px] w-[150px] z-50 p-2 rounded-md">
-            {pages.map((page) => (
-              <Link
-                onClick={() => setOpen(false)}
-                className="block rounded-sm text-white font-bold"
-                key={page.link}
-                to={page.link}
-              >
-                {page.text}
-              </Link>
-            ))}
-            <Link
-              onClick={() => setOpen(false)}
-              className="flex gap-2 bg-prim-300 justify-center p-1 round-xl"
-              to="/add"
-            >
-              <img src={plus} alt="icon" className="w-[18px]" />
-              <p className="text-white font-bold">Add Card</p>
-            </Link>
-          </div>
-        )}
+        <Dropdown menu={{ items }} trigger={["click"]}>
+          <a onClick={(e) => e.preventDefault()}>
+            <div className="hidden max-sm:block bg-prim-500 p-2 rounded-md">
+              <img src={burger} alt="icon" className="w-[18px]" />
+            </div>
+          </a>
+        </Dropdown>
       </div>
     </div>
   );

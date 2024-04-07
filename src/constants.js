@@ -1,10 +1,11 @@
 export const TAG_LIST = [
   "Database",
   "System Design",
-  "DSA",
+  "Algorithm",
   "Backend",
   "Go",
-  "Computer Science",
+  "Networking",
+  "OSystem",
   "English",
 ];
 
