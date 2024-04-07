@@ -10,6 +10,8 @@ import {
 } from "antd";
 import { TAG_LIST } from "../../constants";
 import { useEffect } from "react";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 import MDEditor from "@uiw/react-md-editor";
 import cardsApi from "../../api/cardsApi";
 
@@ -96,11 +98,15 @@ const CardForm = ({ card, mode }) => {
           <Select mode="multiple" options={options} />
         </Form.Item>
 
-        <Form.Item label="Description" name="description">
-          <MDEditor data-color-mode="light" />
+        <Form.Item
+          data-color-mode="light"
+          label="Description"
+          name="description"
+        >
+          <MDEditor />
         </Form.Item>
-        <Form.Item label="Content" name="content">
-          <MDEditor data-color-mode="light" />
+        <Form.Item data-color-mode="light" label="Content" name="content">
+          <MDEditor />
         </Form.Item>
         <Form.Item label="Language" name={["code_snippet", "language"]}>
           <Radio.Group>

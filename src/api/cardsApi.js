@@ -14,12 +14,9 @@ const cardsApi = {
     return axiosClient.get(url);
   },
   getAllCards: (params) => {
-    const data = {
-      ...params,
-    };
-
     const url = `/cards`;
-    return axiosClient.get(url, { params: data });
+    params.tags = params.tags.join(",");
+    return axiosClient.get(url, { params: params });
   },
   updateCard: (id, data) => {
     const url = `/cards/${id}`;
