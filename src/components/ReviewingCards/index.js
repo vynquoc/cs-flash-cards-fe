@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { CodeFilled, ReadFilled, FireFilled } from "@ant-design/icons";
 import { Tabs, message } from "antd";
 
-import { Button } from "antd";
+import { Button, Progress } from "antd";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 
@@ -129,7 +129,9 @@ const ReviewingCard = ({ cards, random }) => {
               {
                 key: "code",
                 label: "Code",
-                disabled: cards[index]?.code_snippet === null,
+                disabled:
+                  cards[index]?.code_snippet === null ||
+                  JSON.stringify(cards[index]?.code_snippet) === "{}",
                 children: <Code card={cards[index]} />,
                 icon: <CodeFilled />,
               },
@@ -182,6 +184,13 @@ const ReviewingCard = ({ cards, random }) => {
                 Got it
               </Button>
             </div>
+          )}
+          {!random && (
+            <Progress
+              showInfo={false}
+              percent={((index + 1) / cards.length) * 100}
+              strokeColor={"#164863"}
+            />
           )}
           {contextHolder}
         </>
