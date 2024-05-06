@@ -11,6 +11,7 @@ import MDEditor from "@uiw/react-md-editor";
 import cardsApi from "../../api/cardsApi";
 
 function General({ card, flipped }) {
+  console.log(123);
   return (
     <div
       data-color-mode="light"
