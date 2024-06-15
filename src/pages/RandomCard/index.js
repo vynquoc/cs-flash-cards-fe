@@ -20,16 +20,16 @@ const RandomCardPage = () => {
   }, [fetching]);
 
   return (
-    <Flex vertical align="center" className="">
+    <div className="flex flex-col items-center">
       <Button
-        className="w-[150px] font-bold"
+        className="w-[150px] font-bold mx-auto"
         type="primary"
         size="large"
         onClick={() => setFetching(!fetching)}
         icon={<RedoOutlined />}
       ></Button>
       <ReviewingCard cards={[card]} random />
-    </Flex>
+    </div>
   );
 };
 

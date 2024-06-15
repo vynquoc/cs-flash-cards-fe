@@ -1,19 +1,12 @@
-import {
-  Button,
-  Flex,
-  Form,
-  Input,
-  Radio,
-  Select,
-  Typography,
-  message,
-} from "antd";
+import { Button, Flex, Form, Input, Radio, Select, message } from "antd";
 import { TAG_LIST } from "../../constants";
 import { useEffect } from "react";
+import dayjs from "dayjs";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import MDEditor from "@uiw/react-md-editor";
 import cardsApi from "../../api/cardsApi";
+import ImageUpload from "..";
 
 const options = TAG_LIST.map((item) => ({ label: item, value: item }));
 
@@ -22,13 +15,17 @@ const CardForm = ({ card, mode }) => {
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleSubmit = async () => {
-    console.log(form.getFieldsValue());
-    update();
     try {
       if (mode === "add") {
-        await cardsApi.createCard(form.getFieldsValue());
+        add();
+        const data = {
+          ...form.getFieldsValue(),
+          next_review_date: dayjs().add(1, "day"),
+        };
+        await cardsApi.createCard(data);
         form.resetFields();
       } else {
+        update();
         const editData = {};
         for (const [key, value] of Object.entries(card)) {
           const newValue = form.getFieldValue(key);
@@ -40,8 +37,22 @@ const CardForm = ({ card, mode }) => {
       }
       success();
     } catch (error) {
-      updateError();
+      if (error.response.status.toString().startsWith(4)) {
+        updateError("Invalid data. Check your input");
+      } else {
+        updateError("Something went wrong");
+      }
     }
+  };
+
+  const add = () => {
+    messageApi.open({
+      type: "loading",
+      key: "card",
+      content: "Adding",
+      duration: 0,
+    });
+    setTimeout(messageApi.destroy, 1500);
   };
 
   const update = () => {
@@ -64,13 +75,29 @@ const CardForm = ({ card, mode }) => {
     setTimeout(messageApi.destroy, 1500);
   };
 
-  const updateError = () => {
+  const updateError = (msg) => {
     messageApi.open({
       type: "error",
       key: "card",
-      content: "Something wrong!",
+      threshold: 4,
+      content: msg,
     });
   };
+
+  const handleSetDescriptionImage = (url) => {
+    const prev = form.getFieldValue("description");
+    form.setFieldsValue({
+      description: `${prev ? prev : ""}\n![image](${url})`,
+    });
+  };
+
+  const handleSetContentImage = (url) => {
+    const prev = form.getFieldValue("content");
+    form.setFieldsValue({
+      content: `${prev ? prev : ""}\n![image](${url})`,
+    });
+  };
+
   useEffect(() => {
     if (card) {
       form.setFieldsValue(card);
@@ -79,10 +106,10 @@ const CardForm = ({ card, mode }) => {
   return (
     <div className="p-8 max-sm:p-2">
       <Flex justify="space-between" align="center">
-        <Typography.Title>
+        <p className="text-lg font-bold text-prim-500">
           {mode === "add" ? "Add Card" : `Edit ${card?.id}`}
-        </Typography.Title>
-        <Button type="primary" size="large" onClick={handleSubmit}>
+        </p>
+        <Button type="primary" size="middle" onClick={handleSubmit}>
           Save
         </Button>
       </Flex>
@@ -91,30 +118,49 @@ const CardForm = ({ card, mode }) => {
         form={form}
         onFinish={(values) => console.log(values)}
       >
-        <Form.Item label="Title" name="title">
+        <Form.Item label={<p className="font-semibold">Title</p>} name="title">
           <Input />
         </Form.Item>
-        <Form.Item label="Tags" name="tags">
+        <Form.Item label={<p className="font-semibold">Tags</p>} name="tags">
           <Select mode="multiple" options={options} />
         </Form.Item>
-
         <Form.Item
           data-color-mode="light"
-          label="Description"
+          label={
+            <div className="flex items-center gap-2">
+              <p className="font-semibold">Description</p>
+              <ImageUpload onSetImage={handleSetDescriptionImage} />
+            </div>
+          }
           name="description"
         >
-          <MDEditor />
+          <MDEditor className="!h-96" />
         </Form.Item>
-        <Form.Item data-color-mode="light" label="Content" name="content">
-          <MDEditor />
+        <Form.Item
+          data-color-mode="light"
+          label={
+            <div className="flex items-center gap-2">
+              <p className="font-semibold">Content</p>
+              <ImageUpload onSetImage={handleSetContentImage} />
+            </div>
+          }
+          name="content"
+        >
+          <MDEditor className="!h-96" />
         </Form.Item>
-        <Form.Item label="Language" name={["code_snippet", "language"]}>
+        <Form.Item
+          label={<p className="font-semibold">Language</p>}
+          name={["code_snippet", "language"]}
+        >
           <Radio.Group>
             <Radio value={"go"}>Go</Radio>
             <Radio value={"python"}>Python</Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item label="Snippet" name={["code_snippet", "code"]}>
+        <Form.Item
+          label={<p className="font-semibold">Snippet</p>}
+          name={["code_snippet", "code"]}
+        >
           <Input.TextArea style={{ height: "350px" }} />
         </Form.Item>
       </Form>

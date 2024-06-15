@@ -30,6 +30,10 @@ const cardsApi = {
     const url = `/cards/${id}`;
     return axiosClient.delete(url);
   },
+  upload: (file) => {
+    const url = `/upload`;
+    return axiosClient.post(url, file);
+  },
 };
 
 export default cardsApi;

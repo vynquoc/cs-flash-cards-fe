@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+ul li {
+  list-style: initial;
+}
+
+ol li {
+  list-style: decimal;
+}
+
+body {
+  background-color: #f0f2f5;
+}
+
+.ant-tabs-top > .ant-tabs-nav {
+  margin-bottom: 0;
+}

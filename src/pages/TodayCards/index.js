@@ -12,13 +12,15 @@ const TodayCardsPage = () => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     getCards();
   }, []);
+
   return (
-    <div>
+    <>
       <ReviewingCard cards={cards} />
-    </div>
+    </>
   );
 };
 

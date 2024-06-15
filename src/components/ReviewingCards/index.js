@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CodeFilled, ReadFilled, FireFilled } from "@ant-design/icons";
 import { Tabs, message } from "antd";
+import moment from "moment-timezone";
 
 import { Button, Progress } from "antd";
 
@@ -10,12 +11,12 @@ import MDEditor from "@uiw/react-md-editor";
 
 import cardsApi from "../../api/cardsApi";
 
+const DATE_FORMAT = "YYYY-MM-DD";
+const timezone = "Asia/Ho_Chi_Minh";
+
 function General({ card, flipped }) {
   return (
-    <div
-      data-color-mode="light"
-      className="h-[300px] max-sm:h-[330px] flex flex-col overflow-y-scroll"
-    >
+    <div data-color-mode="light" className="h-full flex flex-col">
       {!flipped ? (
         <>
           <h3
@@ -36,7 +37,7 @@ function General({ card, flipped }) {
 
 function Code({ card }) {
   return (
-    <div className="h-[300px] max-sm:h-[330px] text-xs overflow-y-scroll">
+    <div className="h-full text-xs ">
       <SyntaxHighlighter
         language={card?.code_snippet?.language}
         customStyle={{ height: "100%" }}
@@ -69,6 +70,40 @@ const ReviewingCard = ({ cards, random }) => {
     update();
     try {
       await cardsApi.updateCard(cards[index].id, { update_review_date: true });
+      success();
+      handleNext();
+    } catch (error) {
+      console.log(error);
+      updateError();
+    }
+  };
+
+  const handleUpdate = async (difficulty) => {
+    if (!cards[index]) {
+      return;
+    }
+    update();
+    const date = moment.utc(cards[index].next_review_date);
+    let nextDay;
+    try {
+      switch (difficulty) {
+        case "hard":
+          nextDay = date.add(1, "day");
+          break;
+        case "good":
+          nextDay = date.add(3, "day");
+          break;
+        case "easy":
+          nextDay = date.add(7, "day");
+          break;
+        default:
+          nextDay = date.add(1, "day");
+      }
+      const formattedNextDay = nextDay.format("YYYY-MM-DDTHH:mm:ssZ");
+      console.log(formattedNextDay);
+      await cardsApi.updateCard(cards[index].id, {
+        next_review_date: formattedNextDay,
+      });
       success();
       handleNext();
     } catch (error) {
@@ -110,99 +145,87 @@ const ReviewingCard = ({ cards, random }) => {
     setFlipped(false);
   }, [cards]);
 
+  if (cards.length === 0 || index >= cards.length) {
+    return (
+      <div className="flex items-center justify-center h-[32rem] flex-col">
+        <FireFilled className="text-prim-500 text-6xl" />
+        <h1 className="text-2xl text-prim-500">You've reviewed all cards</h1>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-[700px] mx-auto max-sm:w-full max-sm:rounded-none mt-10 border px-4 pb-4 rounded-xl">
-      {cards.length > 0 ? (
-        <>
-          <Tabs
-            centered
-            size="large"
-            activeKey={tab}
-            onTabClick={(key) => setTab(key)}
-            items={[
-              {
-                key: "general",
-                label: "General",
-                children: <General card={cards[index]} flipped={flipped} />,
-                icon: <ReadFilled />,
-              },
-              {
-                key: "code",
-                label: "Code",
-                disabled:
-                  cards[index]?.code_snippet === null ||
-                  JSON.stringify(cards[index]?.code_snippet) === "{}",
-                children: <Code card={cards[index]} />,
-                icon: <CodeFilled />,
-              },
-            ]}
-          />
-          <div
-            className={`flex mt-2 ${
-              random ? "justify-center" : "justify-between"
-            }`}
-          >
-            {!random && (
-              <Button
-                type="primary"
-                onClick={handlePrev}
-                size="large"
-                disabled={index === 0}
-                className="font-bold"
-              >
-                Prev
-              </Button>
-            )}
+    <div className="w-full sm:w-[500px] sm:mx-auto">
+      <Tabs
+        activeKey={tab}
+        onChange={(key) => setTab(key)}
+        centered
+        items={[
+          { key: "general", label: "General", icon: <ReadFilled /> },
+          {
+            key: "code",
+            label: "Code",
+            icon: <CodeFilled />,
+            disabled:
+              cards[index]?.code_snippet === null ||
+              JSON.stringify(cards[index]?.code_snippet) === "{}",
+          },
+        ]}
+      />
+      <div className="p-4 mt-6">
+        <div
+          onClick={() => setFlipped(!flipped)}
+          className="overflow-y-scroll h-[32rem] bg-white border border-gray-300 rounded-lg shadow-md p-2"
+        >
+          {tab === "general" ? (
+            <General card={cards[index]} flipped={flipped} />
+          ) : (
+            <Code card={cards[index]} />
+          )}
+        </div>
+      </div>
+      <p className="pr-4 text-right font-bold text-prim-500">
+        {index + 1} / {cards.length}
+      </p>
+      <div className="fixed bottom-0 bg-white w-full p-2 py-4 border-t border-solid border-t-gray-300 flex gap-1 sm:w-[500px]">
+        {!random && (
+          <>
             <Button
-              onClick={() => setFlipped(!flipped)}
+              onClick={handleNext}
               type="primary"
               size="large"
-              className="font-bold"
+              className="!bg-red-600 w-1/4"
             >
-              Flip
+              Repeat
             </Button>
-            {!random && (
-              <Button
-                onClick={handleNext}
-                type="primary"
-                size="large"
-                disabled={index === cards.length - 1}
-                className="font-bold"
-              >
-                Next
-              </Button>
-            )}
-          </div>
-          {!random && (
-            <div className="flex justify-center mt-4">
-              <Button
-                className="w-[100px] mx-auto font-bold"
-                type="primary"
-                size="large"
-                onClick={handleDone}
-              >
-                Got it
-              </Button>
-            </div>
-          )}
-          {!random && (
-            <Progress
-              showInfo={false}
-              percent={((index + 1) / cards.length) * 100}
-              strokeColor={"#164863"}
-            />
-          )}
-          {contextHolder}
-        </>
-      ) : (
-        <div className="h-[300px] text-prim-500 flex flex-col justify-center items-center">
-          <FireFilled style={{ fontSize: "60px" }} />
-          <p className="my-4 font-semibold">
-            You have reviewed all cards today
-          </p>
-          <b>Keep Learning!</b>
-        </div>
-      )}
+            <Button
+              size="large"
+              onClick={() => handleUpdate("hard")}
+              type="primary"
+              className="w-1/4"
+            >
+              Hard
+            </Button>
+            <Button
+              size="large"
+              onClick={() => handleUpdate("good")}
+              type="primary"
+              className="w-1/4"
+            >
+              Good
+            </Button>
+            <Button
+              size="large"
+              onClick={() => handleUpdate("easy")}
+              type="primary"
+              className="w-1/4"
+            >
+              Easy
+            </Button>
+          </>
+        )}
+      </div>
+      {contextHolder}
     </div>
   );
 };

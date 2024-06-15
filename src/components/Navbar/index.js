@@ -38,7 +38,7 @@ const items = [
   {
     icon: <PlusCircleFilled className="text-prim-500" />,
     label: <Link to="/add">Add Card</Link>,
-    key: "3",
+    key: "4",
   },
 ];
 
@@ -46,7 +46,6 @@ function Navbar() {
   return (
     <div className="bg-prim-200 p-4 flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <img className="w-[50px] max-sm:w-[40px]" src={logo} alt="logo" />
         <b className="text-prim-500 text-3xl max-sm:hidden">FlashCards</b>
       </div>
       <ul className="flex gap-4 font-bold max-sm:hidden">

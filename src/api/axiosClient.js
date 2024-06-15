@@ -3,7 +3,11 @@ import queryString from "query-string";
 //default config for http requests
 
 const axiosClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL:
+    process.env.NODE_ENV === "development"
+      ? // ? "http://localhost:4000/v1"
+        process.env.REACT_APP_API_URL
+      : process.env.REACT_APP_API_URL,
   headers: {
     "content-type": "application/json",
   },
@@ -25,7 +29,7 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     throw error;
-  }
+  },
 );
 
 export default axiosClient;
