@@ -187,7 +187,7 @@ const ReviewingCard = ({ cards, random }) => {
       <p className="pr-4 text-right font-bold text-prim-500">
         {index + 1} / {cards.length}
       </p>
-      <div className="fixed bottom-0 bg-white w-full p-2 py-4 border-t border-solid border-t-gray-300 flex gap-1 sm:w-[500px]">
+      <div className="fixed bottom-0 bg-white w-full p-2 py-4 pb-8 border-t border-solid border-t-gray-300 flex gap-1 sm:w-[500px]">
         {!random && (
           <>
             <Button
