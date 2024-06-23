@@ -10,6 +10,7 @@ import {
   message,
   Pagination,
   Popconfirm,
+  Collapse,
 } from "antd";
 import { SearchOutlined, LoadingOutlined, ReadFilled } from "@ant-design/icons";
 import { TAG_LIST } from "../../constants";
@@ -30,7 +31,40 @@ const AllCardsPage = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-
+  const items = [
+    {
+      key: "description",
+      label: <p className="font-semibold">Description</p>,
+      children: (
+        <div data-color-mode="light">
+          <MDEditor.Markdown source={currentCard?.description} />
+        </div>
+      ),
+    },
+    {
+      key: "content",
+      label: <p className="font-semibold">Content</p>,
+      children: (
+        <div data-color-mode="light">
+          <MDEditor.Markdown source={currentCard?.content} />
+        </div>
+      ),
+    },
+    {
+      key: "code",
+      label: <p className="font-semibold">Code</p>,
+      children: (
+        <div data-color-mode="light">
+          <SyntaxHighlighter
+            language={currentCard?.code_snippet?.language}
+            customStyle={{ height: "100%" }}
+          >
+            {currentCard?.code_snippet?.code}
+          </SyntaxHighlighter>
+        </div>
+      ),
+    },
+  ];
   const handleSelectTags = (newTag) => {
     const index = filters.tags.indexOf(newTag);
     let newTags = filters.tags;
@@ -108,6 +142,21 @@ const AllCardsPage = () => {
   useEffect(() => {
     getCards({ ...filters, page: currentPage, page_size: rowsPerPage });
   }, [filters, currentPage, rowsPerPage]);
+
+  const filteredItems = [];
+  items.forEach((item) => {
+    if (currentCard) {
+      if (
+        (item.key === "code" && !currentCard.code_snippet) ||
+        JSON.stringify(currentCard[item.key]) === "{}"
+      ) {
+        return;
+      }
+      if (currentCard[item.key] !== "") {
+        filteredItems.push(item);
+      }
+    }
+  });
 
   return (
     <div className="p-4 lg:w-[700px] lg:mx-auto">
@@ -187,7 +236,7 @@ const AllCardsPage = () => {
         footer={null}
         closable={false}
       >
-        <div className="max-sm:max-h-[500px] overflow-y-scroll">
+        <div className="max-sm:max-h-[500px] min-h-[300px] overflow-y-scroll">
           <div className="flex justify-between pb-4 border-b">
             <div>
               <Button type="link">
@@ -215,31 +264,7 @@ const AllCardsPage = () => {
             <p className="text-xl font-bold text-center mt-6">
               {currentCard?.title}
             </p>
-            {currentCard?.description !== "" && (
-              <>
-                <Divider style={{ color: "#d3d3d3" }}>Description</Divider>
-                <div data-color-mode="light">
-                  <MDEditor.Markdown source={currentCard?.description} />
-                </div>
-              </>
-            )}
-            <Divider style={{ color: "#d3d3d3" }}>Content</Divider>
-            <div data-color-mode="light">
-              <MDEditor.Markdown source={currentCard?.content} />
-            </div>
-            {currentCard?.code_snippet && (
-              <>
-                <Divider style={{ color: "#d3d3d3" }}>Code</Divider>
-                <div data-color-mode="light">
-                  <SyntaxHighlighter
-                    language={currentCard?.code_snippet?.language}
-                    customStyle={{ height: "100%" }}
-                  >
-                    {currentCard?.code_snippet?.code}
-                  </SyntaxHighlighter>
-                </div>
-              </>
-            )}
+            {currentCard && <Collapse bordered={false} items={filteredItems} />}
           </div>
         </div>
       </Modal>

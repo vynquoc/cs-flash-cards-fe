@@ -17,3 +17,15 @@ body {
 .ant-tabs-top > .ant-tabs-nav {
   margin-bottom: 0;
 }
+
+.ant-picker-input input {
+  display: none !important;
+}
+
+.ant-picker-suffix {
+  margin: 0 !important;
+}
+.ant-collapse .ant-collapse-content > .ant-collapse-content-box {
+  padding: 0;
+  padding-right: 8px;
+}

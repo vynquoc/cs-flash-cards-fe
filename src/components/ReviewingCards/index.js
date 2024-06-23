@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { CodeFilled, ReadFilled, FireFilled } from "@ant-design/icons";
-import { Tabs, message } from "antd";
+import {
+  CodeFilled,
+  ReadFilled,
+  FireFilled,
+  CalendarFilled,
+} from "@ant-design/icons";
+import { Tabs, DatePicker, message } from "antd";
 import moment from "moment-timezone";
 
-import { Button, Progress } from "antd";
+import { Button } from "antd";
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 
 import MDEditor from "@uiw/react-md-editor";
 
 import cardsApi from "../../api/cardsApi";
-
-const DATE_FORMAT = "YYYY-MM-DD";
-const timezone = "Asia/Ho_Chi_Minh";
 
 function General({ card, flipped }) {
   return (
@@ -78,6 +80,20 @@ const ReviewingCard = ({ cards, random }) => {
     }
   };
 
+  const onChange = async (date) => {
+    update();
+    const updated = date.format("YYYY-MM-DDTHH:mm:ssZ");
+    try {
+      await cardsApi.updateCard(cards[index].id, {
+        next_review_date: updated,
+      });
+      success();
+      handleNext();
+    } catch (error) {
+      updateError();
+    }
+  };
+
   const handleUpdate = async (difficulty) => {
     if (!cards[index]) {
       return;
@@ -100,14 +116,12 @@ const ReviewingCard = ({ cards, random }) => {
           nextDay = date.add(1, "day");
       }
       const formattedNextDay = nextDay.format("YYYY-MM-DDTHH:mm:ssZ");
-      console.log(formattedNextDay);
       await cardsApi.updateCard(cards[index].id, {
         next_review_date: formattedNextDay,
       });
       success();
       handleNext();
     } catch (error) {
-      console.log(error);
       updateError();
     }
   };
@@ -156,6 +170,23 @@ const ReviewingCard = ({ cards, random }) => {
 
   return (
     <div className="w-full sm:w-[500px] sm:mx-auto">
+      <div className="p-4 mt-6">
+        {!random && (
+          <p className="pr-4 font-bold text-prim-500 text-sm">
+            {index + 1} / {cards.length}
+          </p>
+        )}
+        <div
+          onClick={() => setFlipped(!flipped)}
+          className="overflow-y-scroll h-[32rem] bg-white border border-gray-300 rounded-lg shadow-md p-2"
+        >
+          {tab === "general" ? (
+            <General card={cards[index]} flipped={flipped} />
+          ) : (
+            <Code card={cards[index]} />
+          )}
+        </div>
+      </div>
       <Tabs
         activeKey={tab}
         onChange={(key) => setTab(key)}
@@ -172,59 +203,50 @@ const ReviewingCard = ({ cards, random }) => {
           },
         ]}
       />
-      <div className="p-4 mt-6">
-        <div
-          onClick={() => setFlipped(!flipped)}
-          className="overflow-y-scroll h-[32rem] bg-white border border-gray-300 rounded-lg shadow-md p-2"
-        >
-          {tab === "general" ? (
-            <General card={cards[index]} flipped={flipped} />
-          ) : (
-            <Code card={cards[index]} />
-          )}
+      {!random && (
+        <div className="fixed bottom-0 bg-white w-full p-2 py-4 pb-8 border-t border-solid border-t-gray-300 flex gap-1 sm:w-[500px]">
+          <Button
+            onClick={handleNext}
+            type="primary"
+            size="large"
+            className="!bg-red-600 w-1/4"
+          >
+            Repeat
+          </Button>
+          <Button
+            size="large"
+            onClick={() => handleUpdate("hard")}
+            type="primary"
+            className="w-1/4"
+          >
+            Hard
+          </Button>
+          <Button
+            size="large"
+            onClick={() => handleUpdate("good")}
+            type="primary"
+            className="w-1/4"
+          >
+            Good
+          </Button>
+          <Button
+            size="large"
+            onClick={() => handleUpdate("easy")}
+            type="primary"
+            className="w-1/4"
+          >
+            Easy
+          </Button>
+          <DatePicker
+            onChange={onChange}
+            needConfirm
+            format={false}
+            variant="borderless"
+            placeholder={null}
+            suffixIcon={<CalendarFilled className="text-prim-500" />}
+          />
         </div>
-      </div>
-      <p className="pr-4 text-right font-bold text-prim-500">
-        {index + 1} / {cards.length}
-      </p>
-      <div className="fixed bottom-0 bg-white w-full p-2 py-4 pb-8 border-t border-solid border-t-gray-300 flex gap-1 sm:w-[500px]">
-        {!random && (
-          <>
-            <Button
-              onClick={handleNext}
-              type="primary"
-              size="large"
-              className="!bg-red-600 w-1/4"
-            >
-              Repeat
-            </Button>
-            <Button
-              size="large"
-              onClick={() => handleUpdate("hard")}
-              type="primary"
-              className="w-1/4"
-            >
-              Hard
-            </Button>
-            <Button
-              size="large"
-              onClick={() => handleUpdate("good")}
-              type="primary"
-              className="w-1/4"
-            >
-              Good
-            </Button>
-            <Button
-              size="large"
-              onClick={() => handleUpdate("easy")}
-              type="primary"
-              className="w-1/4"
-            >
-              Easy
-            </Button>
-          </>
-        )}
-      </div>
+      )}
       {contextHolder}
     </div>
   );
