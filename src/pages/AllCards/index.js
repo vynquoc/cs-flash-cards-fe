@@ -146,16 +146,21 @@ const AllCardsPage = () => {
   const filteredItems = [];
   items.forEach((item) => {
     if (currentCard) {
-      if (
-        (item.key === "code" && !currentCard.code_snippet) ||
-        JSON.stringify(currentCard[item.key]) === "{}"
-      ) {
-        return;
-      }
-      if (currentCard[item.key] !== "") {
-        filteredItems.push(item);
+      const key = item.key;
+      if (key === "code") {
+        if (
+          !currentCard.code_snippet ||
+          JSON.stringify(currentCard.code_snippet) === "{}"
+        ) {
+          return;
+        }
+      } else {
+        if (!currentCard[key]) {
+          return;
+        }
       }
     }
+    filteredItems.push(item);
   });
 
   return (
@@ -214,7 +219,7 @@ const AllCardsPage = () => {
                 <div className="flex gap-1">
                   {item.tags.map((tag) => (
                     <div
-                      className="bg-prim-400 text-white font-bold px-1 rounded-md"
+                      className="bg-prim-400 text-white text-[8px] font-semibold px-1 py-1 rounded"
                       key={tag}
                     >
                       {tag}
