@@ -99,7 +99,7 @@ const ReviewingCard = ({ cards, random }) => {
       return;
     }
     update();
-    const date = moment.utc(cards[index].next_review_date);
+    const date = moment.utc(new Date());
     let nextDay;
     try {
       switch (difficulty) {
