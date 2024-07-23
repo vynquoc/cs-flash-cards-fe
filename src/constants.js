@@ -7,6 +7,7 @@ export const TAG_LIST = [
   "Networking",
   "OSystem",
   "English",
+  "Frontend",
 ];
 
-export const LANGUAGE_LIST = ["go", "python"];
+export const LANGUAGE_LIST = ["go", "python", "javascript", "typescript"];

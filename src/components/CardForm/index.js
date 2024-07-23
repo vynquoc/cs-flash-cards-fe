@@ -155,6 +155,8 @@ const CardForm = ({ card, mode }) => {
           <Radio.Group>
             <Radio value={"go"}>Go</Radio>
             <Radio value={"python"}>Python</Radio>
+            <Radio value={"javascript"}>JavaScript</Radio>
+            <Radio value={"typescript"}>TypeScript</Radio>
           </Radio.Group>
         </Form.Item>
         <Form.Item
