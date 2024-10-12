@@ -8,6 +8,9 @@ export const TAG_LIST = [
   "OSystem",
   "English",
   "Frontend",
+  "Vim",
+  "Cloud",
+  "Design Pattern",
 ];
 
 export const LANGUAGE_LIST = ["go", "python", "javascript", "typescript"];
