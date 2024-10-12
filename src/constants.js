@@ -11,6 +11,7 @@ export const TAG_LIST = [
   "Vim",
   "Cloud",
   "Design Pattern",
+  "SQL",
 ];
 
 export const LANGUAGE_LIST = ["go", "python", "javascript", "typescript"];
